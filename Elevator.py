@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 import sys
-
+import time
 pygame.init()
 width, height = 680,720
 screen = pygame.display.set_mode((width,height))
@@ -27,6 +27,21 @@ for x in range(70,701,70):
 print(hieghts)
 
 y= 720-hieghts[0]
+
+def goupdown(diroftr,que,y):
+    if diroftr == 1:
+        for each in que:
+            print(720-hieghts[(each[0]-1)],y)
+            if 720 - hieghts[(each[0]-1)] < 720 - y and each[1] == 1:
+                print("YES")
+                y += 10
+            if each[0] == y:
+                time.sleep(5)
+
+
+
+
+
 def generalbkg():
     screen.fill((150,150,150))
     empty_rect = pygame.Rect(20, 10, 100,700)
@@ -37,7 +52,7 @@ def generalbkg():
     pygame.draw.rect(screen, (0, 0, 0), empty_rect, 3)
     empty_rect = pygame.Rect(460, 10, 200, 700)
     pygame.draw.rect(screen, (0, 0, 0), empty_rect, 3)
-diroftvl = 0
+diroftvl = 1
 def flnums(buttonspress,selected):
     count = 1
     for y in range(700,0,-70):
@@ -66,9 +81,8 @@ def elevator(y):
 qeue = []
 
 while True:
-    y = 720 - hieghts[selected-1]
+    #y = 720 - hieghts[selected-1]
     xcord, ycord = pygame.mouse.get_pos()
-    print (selected)
 
 
 
@@ -94,13 +108,12 @@ while True:
                 if selected != 1:
                     qeue.append([selected,0])
 
-
+    goupdown(diroftvl,qeue,y)
     generalbkg()
     flnums(buttonspress,selected)
     elevator(y)
     pygame.display.update()
     fpsClock.tick(10)
-    print(qeue)
 pygame.quit()
 
 
