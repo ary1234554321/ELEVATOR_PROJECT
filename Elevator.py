@@ -89,6 +89,8 @@ while True:
     xcord, ycord = pygame.mouse.get_pos()
 
     if diroftvl == 1:
+        highercount = 0
+        lowercount = 0
         for each in qeue:
             if hieghts[each[0] - 1]-50 <  y:
                 y -= speed
@@ -101,6 +103,9 @@ while True:
                 buttonspress[10 - each[0]][1] = 0
                 diroftvl = 0
                 start_ticks = pygame.time.get_ticks()  # starter tick
+            if hieghts[each[0]-1]-50 >y:
+                lowercount += 1
+
     if diroftvl == 2:
         for each in qeue:
             if hieghts[each[0] - 1]-50 >  y:
@@ -117,8 +122,6 @@ while True:
 
     if diroftvl == 0:
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000  # calculate how many seconds
-
-
 
 
         if seconds > 12:
