@@ -20,7 +20,13 @@ selected = 1
 buttonspress = []
 for x in range(10):
     buttonspress.append([0,0])
+hieghts = []
 
+for x in range(70,701,70):
+    hieghts.append(x)
+print(hieghts)
+
+y= 720-hieghts[0]
 def generalbkg():
     screen.fill((150,150,150))
     empty_rect = pygame.Rect(20, 10, 100,700)
@@ -31,13 +37,14 @@ def generalbkg():
     pygame.draw.rect(screen, (0, 0, 0), empty_rect, 3)
     empty_rect = pygame.Rect(460, 10, 200, 700)
     pygame.draw.rect(screen, (0, 0, 0), empty_rect, 3)
-
+diroftvl = 0
 def flnums(buttonspress,selected):
     count = 1
     for y in range(700,0,-70):
         if buttonspress[count-1][0] == 0 and buttonspress[count-1][1] == 0:
             pygame.draw.rect(screen,colors[0],(35,720-y,70,35))
-        if buttonspress[count-1] == 1 or buttonspress[count-1] == 1:
+
+        else:
             pygame.draw.rect(screen,colors[1],(35,720-y,70,35))
 
 
@@ -53,14 +60,16 @@ def flnums(buttonspress,selected):
             screen.blit(text, (40, 720 - y))
         count += 1
 
+def elevator(y):
+    pygame.draw.rect(screen,(0,0,0), (300,y,70,35))
 
-
-#def buttons():
-    #for y in range()
+qeue = []
 
 while True:
+    y = 720 - hieghts[selected-1]
     xcord, ycord = pygame.mouse.get_pos()
     print (selected)
+
 
 
     for event in pygame.event.get():
@@ -76,14 +85,22 @@ while True:
                     selected -= 1
             if event.key == pygame.K_UP:
                 buttonspress[10-selected][0] = 1
+                if selected != 10:
+                    qeue.append([selected,1])
+
+
             if event.key == pygame.K_DOWN:
                 buttonspress[10-selected][1] = 1
+                if selected != 1:
+                    qeue.append([selected,0])
+
+
     generalbkg()
     flnums(buttonspress,selected)
-
+    elevator(y)
     pygame.display.update()
     fpsClock.tick(10)
-    print(buttonspress)
+    print(qeue)
 pygame.quit()
 
 
