@@ -29,9 +29,10 @@ hieghts.reverse()
 
 y= 720-hieghts[9]
 
-speed = 70/40
-speed = 5
-speedtick = 30
+speed = 2
+#speed = 5
+speedtick = 10
+speedtick = 60
 
 def generalbkg():
     screen.fill((150,150,150))
@@ -47,11 +48,10 @@ diroftvl = 3
 def flnums(buttonspress,selected):
     count = 1
     for y in range(700,0,-70):
-        if buttonspress[count-1][0] == 0 and buttonspress[count-1][1] == 0:
-            pygame.draw.rect(screen,colors[0],(35,720-y,70,35))
 
-        else:
-            pygame.draw.rect(screen,colors[1],(35,720-y,70,35))
+        pygame.draw.rect(screen,colors[0],(35,720-y,70,35))
+
+
 
 
         font = pygame.font.Font('freesansbold.ttf', 45)
@@ -68,9 +68,9 @@ def flnums(buttonspress,selected):
 
 def elevator(y,dir,secs):
     pygame.draw.rect(screen,(0,0,0), (300,y,130,35))
-    pygame.draw.rect(screen, (255, 255, 255), (300, y, (secs / 12) *130, 35))
+    pygame.draw.rect(screen, (200, 200, 200), (300, y, (secs / 12) *130, 35))
     font = pygame.font.Font('freesansbold.ttf', 15)
-    text = font.render(f"{'OPEN' if dir == 0 else 'closed'}", False, (0, 255, 0))
+    text = font.render(f"{'OPEN' if dir == 0 else 'closed'}", False, (255, 0, 0))
     screen.blit(text, (310, y+10))
 
 
@@ -89,13 +89,27 @@ def fl1rem(que):
 
     return res
 
+def butdir(buts):
 
-def drawarrow(que):
-    for each in que:
-        font = pygame.font.Font('freesansbold.ttf', 25)
-        text = font.render(f"{'up' if each[1] == 1 else 'down'}", False, (0, 255, 0))
-        screen.blit(text, (160, hieghts[each[0]-1]-45))
+    for countx,x in enumerate(range(150,211,60)):
+        for county,y in enumerate(range(70,701,70)):
+            if buts[county][countx] == 1:
+                pygame.draw.rect(screen,yellow,(x,y-40,50,20))
+            else:
+                pygame.draw.rect(screen, (255,255,255), (x, y - 40, 50, 20))
+    for county,y in enumerate(range(70,701,70)):
+        if buts[county][0] == 1:
+            font = pygame.font.Font('freesansbold.ttf', 15)
+            text = font.render("UP", False, (0, 255, 255))
+            screen.blit(text, (160,y-35))
+    for county,y in enumerate(range(70,701,70)):
+        if buts[county][1] == 1:
+            font = pygame.font.Font('freesansbold.ttf', 15)
+            text = font.render("DOWN", False, (0, 255, 255))
+            screen.blit(text, (210,y-35))
 
+
+prev = 0
 qeue = []
 seconds = 0
 while True:
@@ -108,6 +122,7 @@ while True:
 
 
     if diroftvl == 1:
+        prv = 1
         highercount = 0
         for each in qeue:
 
@@ -126,6 +141,7 @@ while True:
             y -= speed
 
     if diroftvl == 2:
+        prev = 2
         lowercount = 0
         for each in qeue:
             if hieghts[each[0] - 1]-50 >  y:
@@ -171,9 +187,11 @@ while True:
                     lowercount += 1
                 if hieghts[each[0] - 1] - 50 < y:
                     highercount += 1
-            print(y,hieghts[0]-50)
             if highercount > 0:
-                diroftvl = 1
+                if hieghts[0]-50 == y:
+                    diroftvl = 1
+                else:
+                    diroftvl = 2
             if highercount == 0:
                 if y != hieghts[0] -50:
                     diroftvl = 2
@@ -208,15 +226,13 @@ while True:
         if event.type == pygame.MOUSEBUTTONUP:
             print(xcord,ycord)
     qeue = checker(qeue)
-    drawarrow(qeue)
     generalbkg()
     flnums(buttonspress,selected)
     elevator(y, diroftvl,seconds)
-    drawarrow(qeue)
+
+    butdir(buttonspress)
     pygame.display.update()
     fpsClock.tick(speedtick)
     print(diroftvl)
     print(qeue)
 pygame.quit()
-
-
