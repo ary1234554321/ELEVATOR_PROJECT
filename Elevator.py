@@ -35,7 +35,6 @@ speedtick = 10
 speedtick = 60
 
 def generalbkg():
-    screen.fill((150,150,150))
     empty_rect = pygame.Rect(20, 10, 100,700)
     pygame.draw.rect(screen, (0, 0, 0), empty_rect, 3)
     empty_rect = pygame.Rect(140, 10, 130,700)
@@ -90,7 +89,6 @@ def fl1rem(que):
     return res
 
 def butdir(buts):
-
     for countx,x in enumerate(range(150,211,60)):
         for county,y in enumerate(range(70,701,70)):
             if buts[county][countx] == 1:
@@ -109,10 +107,27 @@ def butdir(buts):
             screen.blit(text, (210,y-35))
 
 
+insidebuts = []
+for x in range(10):
+    insidebuts.append(0)
+
+def drawinsidebuttons(buts):
+    for count,each in enumerate(buts):
+
+        if each == 0:
+            pygame.draw.circle(screen, (0, 0, 0), (540,((count+1)*70)-25),30 )
+        if each == 1:
+            pygame.draw.circle(screen, yellow, (540,((count+1)*70)-25),30 )
+
+        font = pygame.font.Font('freesansbold.ttf', 25)
+        text = font.render(f"{count+1}", False, (0, 255, 255))
+        screen.blit(text, (535, ((count+1)*70)-35))
+
 prev = 0
 qeue = []
 seconds = 0
 while True:
+    screen.fill((150, 150, 150))
     #y = 720 - hieghts[selected-1]
     xcord, ycord = pygame.mouse.get_pos()
     if diroftvl == 3:
@@ -122,12 +137,14 @@ while True:
 
 
     if diroftvl == 1:
-        prv = 1
+        prev = 1
         highercount = 0
         for each in qeue:
 
-            if hieghts[each[0] - 1]-50 <  y:
+            if hieghts[each[0] - 1]-50 < y:
                 highercount += 1
+
+
             if hieghts[each[0]-1]-50 == y:
                 try:
                     qeue.remove([each[0],0])
@@ -137,6 +154,8 @@ while True:
                 buttonspress[10 - each[0]][1] = 0
                 diroftvl = 0
                 start_ticks = pygame.time.get_ticks()  # starter tick
+
+
         if highercount > 0:
             y -= speed
 
@@ -173,11 +192,13 @@ while True:
         if seconds > 12:
             if y == hieghts[0]-50:
                 qeue = fl1rem(qeue)
-
                 diroftvl = 1
+
             highercount = 0
             lowercount = 0
+
             for each in qeue:
+
                 if hieghts[each[0] - 1] - 50 == y:
                     try:
                         qeue.remove([each[0], 0])
@@ -187,11 +208,24 @@ while True:
                     lowercount += 1
                 if hieghts[each[0] - 1] - 50 < y:
                     highercount += 1
-            if highercount > 0:
-                if hieghts[0]-50 == y:
-                    diroftvl = 1
-                else:
+
+            if highercount > 0 and hieghts[0]-50 == y:
+                diroftvl = 1
+
+            if highercount > 0 and lowercount == 0:
+                diroftvl = 1
+
+            if prev == 1 and highercount > 0:
+                print("PReVcheck")
+                diroftvl = 1
+
+            if lowercount > 0 and highercount == 0:
+                diroftvl = 2
+
+            if prev == 2:
+                if hieghts[0]-50 != y:
                     diroftvl = 2
+
             if highercount == 0:
                 if y != hieghts[0] -50:
                     diroftvl = 2
@@ -223,16 +257,54 @@ while True:
                 if selected != 1:
                     buttonspress[10 - selected][1] = 1
                     qeue.append([selected,0])
+
+
+            if event.key == pygame.K_1:
+
+                insidebuts[0] = 1
+                qeue.append([1])
+            if event.key == pygame.K_2:
+                insidebuts[1] = 1
+                qeue.append([1])
+            if event.key == pygame.K_3:
+                insidebuts[2] = 1
+                qeue.append([1])
+
+            if event.key == pygame.K_4:
+                insidebuts[3] = 1
+                qeue.append([1])
+            if event.key == pygame.K_5:
+                insidebuts[4] = 1
+                qeue.append([1])
+            if event.key == pygame.K_6:
+                insidebuts[5] = 1
+                qeue.append([1])
+            if event.key == pygame.K_7:
+                insidebuts[6] = 1
+                qeue.append([1])
+            if event.key == pygame.K_8:
+                insidebuts[7] = 1
+                qeue.append([1])
+            if event.key == pygame.K_9:
+                insidebuts[8] = 1
+                qeue.append([1])
+            if event.key == pygame.K_0:
+                insidebuts[9] = 1
+                qeue.append([1])
+
+
         if event.type == pygame.MOUSEBUTTONUP:
             print(xcord,ycord)
+
+
     qeue = checker(qeue)
     generalbkg()
     flnums(buttonspress,selected)
     elevator(y, diroftvl,seconds)
 
     butdir(buttonspress)
-    pygame.display.update()
+
     fpsClock.tick(speedtick)
-    print(diroftvl)
-    print(qeue)
+    drawinsidebuttons(insidebuts)
+    pygame.display.update()
 pygame.quit()
