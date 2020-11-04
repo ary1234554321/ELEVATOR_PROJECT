@@ -1,2 +1,4 @@
-for x, y in enumerate(range(700, 0, -70)):
-    print(x,y)
+import random
+while True:
+    x = random.randint(0,9)
+    print(x)

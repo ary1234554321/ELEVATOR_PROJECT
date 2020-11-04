@@ -2,6 +2,9 @@ import pygame
 from pygame.locals import *
 import sys
 import time
+import random
+
+
 pygame.init()
 width, height = 680,720
 screen = pygame.display.set_mode((width,height))
@@ -195,6 +198,7 @@ while True:
 
         if highercount == 0 and lowercount == 0:
             if y != hieghts[0]-50:
+
                 qeue.append([1,1])
 
     if diroftvl == 0:

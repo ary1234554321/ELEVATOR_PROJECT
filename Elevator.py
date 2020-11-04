@@ -1,7 +1,10 @@
+import random
 import pygame
 from pygame.locals import *
 import sys
 import time
+
+
 pygame.init()
 width, height = 680,720
 screen = pygame.display.set_mode((width,height))
@@ -186,7 +189,9 @@ while True:
 
         if highercount == 0 and lowercount == 0:
             if y != hieghts[0]-50:
-                qeue.append([1,1])
+                ra = random.randint(0, 9)
+                if ra != 0:
+                    qeue.append([1,1])
 
     if diroftvl == 0:
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000  # calculate how many seconds
