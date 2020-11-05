@@ -1,8 +1,8 @@
+import random
 import pygame
 from pygame.locals import *
 import sys
 import time
-import random
 
 
 pygame.init()
@@ -69,25 +69,14 @@ def flnums(buttonspress,selected):
         count += 1
 
 def elevator(y,dir,secs):
-
-
     pygame.draw.rect(screen,(0,0,0), (300,y,130,35))
-
-    if secs < 4:
-        pygame.draw.rect(screen, (200, 200, 200), (300, y, 130 - ((secs/4)*130) , 35))
-    if 4 < secs < 8:
-        pygame.draw.rect(screen, (200, 200, 200), (300, y, 1 , 35))
-
-    if 8 < secs < 13:
-        pygame.draw.rect(screen, (200, 200, 200), (300, y,((secs-8)/4) * 130 , 35))
-
+    pygame.draw.rect(screen, (200, 200, 200), (300, y, (secs / 12) *130, 35))
     font = pygame.font.Font('freesansbold.ttf', 15)
     text = font.render(f"{'OPEN' if dir == 0 else 'closed'}", False, (255, 0, 0))
-    screen.blit(text, (310, y+10))
+    screen.blit(text, (310, y + 10))
 
-    font = pygame.font.Font('freesansbold.ttf', 15)
-    text = font.render(f"{secs}", False, (255, 0, 0))
-    screen.blit(text, (370, y + 10))
+    text2 = font.render(f"{round(secs/100) if dir == 0 else ''}", False, (255, 0, 0))
+    screen.blit(text2, (360, y+10))
 
 
 def checker(que):
@@ -140,24 +129,26 @@ def drawinsidebuttons(buts):
         text = font.render(f"{count+1}", False, (0, 255, 255))
         screen.blit(text, (535, ((count+1)*70)-35))
 
-def butque(buttons):
-    qu =[]
-    for counter,each in enumerate(buttons):
-        if each[0] == 1:
-            qu.append([10-counter,1])
-        if each[1] == 1:
-            qu.append([10-counter,0])
-    return qu
-
-
 prev = 0
 qeue = []
 seconds = 0
+started = True
 while True:
     screen.fill((150, 150, 150))
-    #y = 720 - hieghts[selected-1]
     xcord, ycord = pygame.mouse.get_pos()
+
     if diroftvl == 3:
+        if hieghts[0]-50 != y:
+
+            if started:
+                started = False
+                start_ticks2 = pygame.time.get_ticks()
+            print(seconds2)
+            seconds2 = (pygame.time.get_ticks() - start_ticks2) / 1000  # calculate how many seconds
+            if seconds2 == 60:
+                qeue.append([1, 1])
+                started = True
+
         if len(qeue) > 0:
             diroftvl = 1
 
@@ -165,23 +156,29 @@ while True:
 
     if diroftvl == 1:
         prev = 1
+
+        highest = 0
+        for each in qeue:
+            if hieghts[each[0] - 1] > highest:
+                highest = hieghts[each[0] - 1]
+        print(highest)
         highercount = 0
-
-        highfloor = 0
         for each in qeue:
-            if each[0] > highfloor:
-                highfloor = each[0]
+            if (hieghts[each[0] - 1]-50 < y and each[1] == 1) or hieghts[each[0]-1] == highest:
+                highercount += 1
 
-        for each in qeue:
-            if each[1] == 1 or each[0] == highfloor:
-                if hieghts[each[0] - 1]-50 < y:
-                    highercount += 1
-                if hieghts[each[0]-1]-50 == y:
+
+            if hieghts[each[0]-1]-50 == y:
+                if each[1] == 1 or hieghts[each[0]-1] == highest:
+
+                    try:
+                        qeue.remove([each[0],0])
+                    except:
+                        qeue.remove([each[0],1])
+                    buttonspress[10-each[0]][0] = 0
                     buttonspress[10 - each[0]][1] = 0
                     diroftvl = 0
                     start_ticks = pygame.time.get_ticks()  # starter tick
-
-
         if highercount > 0:
             y -= speed
 
@@ -190,26 +187,33 @@ while True:
         lowercount = 0
         for each in qeue:
             if hieghts[each[0] - 1]-50 >  y:
-                if each[1] != 1:
-                    lowercount += 1
-                else:
-                    if each[0] == 1:
-                        lowercount += 1
-            if (hieghts[each[0]-1]-50 == y and each[1] != 1) or (hieghts[each[0]-1]-50 == y and each[0] == 1):
-
+                lowercount += 1
+            if hieghts[each[0]-1]-50 == y:
+                try:
+                    qeue.remove([each[0],0])
+                except:
+                    qeue.remove([each[0],1])
+                buttonspress[10-each[0]][0] = 0
                 buttonspress[10 - each[0]][1] = 0
                 diroftvl = 0
                 start_ticks = pygame.time.get_ticks()  # starter tick
+                highercount = 0
+                lowercount = 0
+                if hieghts[each[0] - 1] - 50 > y:
+                    lowercount += 1
+                if hieghts[each[0] - 1] - 50 < y:
+                    highercount += 1
         if lowercount > 0:
             y += speed
 
-        if len(qeue) == 0:
-            buttonspress[len(buttonspress)-1][0] = 1
+        if highercount == 0 and lowercount == 0:
+            ran = random.randint(0,9)
+            if ran != 0:
+                qeue.append([1,1])
 
     if diroftvl == 0:
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000  # calculate how many seconds
         if seconds > 12:
-
             if y == hieghts[0]-50:
                 qeue = fl1rem(qeue)
                 diroftvl = 1
@@ -220,10 +224,10 @@ while True:
             for each in qeue:
 
                 if hieghts[each[0] - 1] - 50 == y:
-                    print(hieghts[each[0]-1]-50,y)
-
-                    buttonspress[10-each[0]][0] = 0
-                    buttonspress[10-each[0]][1] = 0
+                    try:
+                        qeue.remove([each[0], 0])
+                    except:
+                        qeue.remove([each[0], 1])
                 if hieghts[each[0] - 1] - 50 > y:
                     lowercount += 1
                 if hieghts[each[0] - 1] - 50 < y:
@@ -251,10 +255,7 @@ while True:
                     diroftvl = 2
                 else:
                     diroftvl = 3
-            if y == hieghts[0]-50:
-                buttonspress[len(buttonspress)-1][0] = 0
             seconds = 0
-
 
 
     for event in pygame.event.get():
@@ -272,13 +273,14 @@ while True:
 
                 if selected != 10:
                     buttonspress[10-selected][0] = 1
-
+                    qeue.append([selected,1])
 
 
             if event.key == pygame.K_DOWN:
 
                 if selected != 1:
                     buttonspress[10 - selected][1] = 1
+                    qeue.append([selected,0])
 
 
             if event.key == pygame.K_1:
@@ -318,8 +320,7 @@ while True:
         if event.type == pygame.MOUSEBUTTONUP:
             print(xcord,ycord)
 
-
-    qeue = butque(buttonspress)
+    qeue = checker(qeue)
     generalbkg()
     flnums(buttonspress,selected)
     elevator(y, diroftvl,seconds)
@@ -329,8 +330,6 @@ while True:
     fpsClock.tick(speedtick)
     drawinsidebuttons(insidebuts)
     pygame.display.update()
-    print(diroftvl)
     print(qeue)
-    print(y)
-    print(buttonspress)
+    print(diroftvl)
 pygame.quit()

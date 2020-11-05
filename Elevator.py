@@ -70,7 +70,17 @@ def flnums(buttonspress,selected):
 
 def elevator(y,dir,secs):
     pygame.draw.rect(screen,(0,0,0), (300,y,130,35))
-    pygame.draw.rect(screen, (200, 200, 200), (300, y, (secs / 12) *130, 35))
+    if secs == 0:
+        pygame.draw.rect(screen, (200, 200, 200), (300, y, 130, 35))
+
+    if secs <= 4:
+        pygame.draw.rect(screen, (200, 200, 200), (300, y, 130 - ((secs / 4) *130), 35))
+    if 4 < secs < 8:
+        pygame.draw.rect(screen, (200, 200, 200), (300, y, 1, 35))
+    if 8< secs< 12:
+        pygame.draw.rect(screen, (200, 200, 200), (300, y, (secs - 8 / 4) *130, 35))
+
+
     font = pygame.font.Font('freesansbold.ttf', 15)
     text = font.render(f"{'OPEN' if dir == 0 else 'closed'}", False, (255, 0, 0))
     screen.blit(text, (310, y+10))
@@ -143,23 +153,20 @@ while True:
         prev = 1
         highercount = 0
         for each in qeue:
-            if each[1] == 1:
-                if hieghts[each[0] - 1]-50 < y:
-                    highercount += 1
+            if hieghts[each[0] - 1]-50 < y:
+                highercount += 1
 
 
-                if hieghts[each[0]-1]-50 == y:
+            if hieghts[each[0]-1]-50 == y:
 
-                    try:
-                        qeue.remove([each[0],0])
-                    except:
-                        qeue.remove([each[0],1])
-                    buttonspress[10-each[0]][0] = 0
-                    buttonspress[10 - each[0]][1] = 0
-                    diroftvl = 0
-                    start_ticks = pygame.time.get_ticks()  # starter tick
-
-            if each
+                try:
+                    qeue.remove([each[0],0])
+                except:
+                    qeue.remove([each[0],1])
+                buttonspress[10-each[0]][0] = 0
+                buttonspress[10 - each[0]][1] = 0
+                diroftvl = 0
+                start_ticks = pygame.time.get_ticks()  # starter tick
         if highercount > 0:
             y -= speed
 
@@ -188,10 +195,7 @@ while True:
             y += speed
 
         if highercount == 0 and lowercount == 0:
-            if y != hieghts[0]-50:
-                ra = random.randint(0, 9)
-                if ra != 0:
-                    qeue.append([1,1])
+                qeue.append([1,1])
 
     if diroftvl == 0:
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000  # calculate how many seconds

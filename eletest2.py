@@ -1,8 +1,8 @@
+import random
 import pygame
 from pygame.locals import *
 import sys
 import time
-import random
 
 
 pygame.init()
@@ -69,25 +69,11 @@ def flnums(buttonspress,selected):
         count += 1
 
 def elevator(y,dir,secs):
-
-
     pygame.draw.rect(screen,(0,0,0), (300,y,130,35))
-
-    if secs < 4:
-        pygame.draw.rect(screen, (200, 200, 200), (300, y, 130 - ((secs/4)*130) , 35))
-    if 4 < secs < 8:
-        pygame.draw.rect(screen, (200, 200, 200), (300, y, 1 , 35))
-
-    if 8 < secs < 13:
-        pygame.draw.rect(screen, (200, 200, 200), (300, y,((secs-8)/4) * 130 , 35))
-
+    pygame.draw.rect(screen, (200, 200, 200), (300, y, (secs / 12) *130, 35))
     font = pygame.font.Font('freesansbold.ttf', 15)
     text = font.render(f"{'OPEN' if dir == 0 else 'closed'}", False, (255, 0, 0))
     screen.blit(text, (310, y+10))
-
-    font = pygame.font.Font('freesansbold.ttf', 15)
-    text = font.render(f"{secs}", False, (255, 0, 0))
-    screen.blit(text, (370, y + 10))
 
 
 def checker(que):
@@ -124,6 +110,20 @@ def butdir(buts):
             screen.blit(text, (210,y-35))
 
 
+def quesort(qu):
+    lis = qu
+    ups = []
+    downs = []
+    for each in lis:
+        if each[1] == 1:
+            ups.append(each)
+
+        if each[1] == 0:
+            downs.append(each)
+
+
+
+
 insidebuts = []
 for x in range(10):
     insidebuts.append(0)
@@ -140,16 +140,6 @@ def drawinsidebuttons(buts):
         text = font.render(f"{count+1}", False, (0, 255, 255))
         screen.blit(text, (535, ((count+1)*70)-35))
 
-def butque(buttons):
-    qu =[]
-    for counter,each in enumerate(buttons):
-        if each[0] == 1:
-            qu.append([10-counter,1])
-        if each[1] == 1:
-            qu.append([10-counter,0])
-    return qu
-
-
 prev = 0
 qeue = []
 seconds = 0
@@ -157,6 +147,7 @@ while True:
     screen.fill((150, 150, 150))
     #y = 720 - hieghts[selected-1]
     xcord, ycord = pygame.mouse.get_pos()
+
     if diroftvl == 3:
         if len(qeue) > 0:
             diroftvl = 1
@@ -164,96 +155,14 @@ while True:
 
 
     if diroftvl == 1:
-        prev = 1
-        highercount = 0
 
-        highfloor = 0
-        for each in qeue:
-            if each[0] > highfloor:
-                highfloor = each[0]
-
-        for each in qeue:
-            if each[1] == 1 or each[0] == highfloor:
-                if hieghts[each[0] - 1]-50 < y:
-                    highercount += 1
-                if hieghts[each[0]-1]-50 == y:
-                    buttonspress[10 - each[0]][1] = 0
-                    diroftvl = 0
-                    start_ticks = pygame.time.get_ticks()  # starter tick
-
-
-        if highercount > 0:
-            y -= speed
 
     if diroftvl == 2:
-        prev = 2
-        lowercount = 0
-        for each in qeue:
-            if hieghts[each[0] - 1]-50 >  y:
-                if each[1] != 1:
-                    lowercount += 1
-                else:
-                    if each[0] == 1:
-                        lowercount += 1
-            if (hieghts[each[0]-1]-50 == y and each[1] != 1) or (hieghts[each[0]-1]-50 == y and each[0] == 1):
-
-                buttonspress[10 - each[0]][1] = 0
-                diroftvl = 0
-                start_ticks = pygame.time.get_ticks()  # starter tick
-        if lowercount > 0:
-            y += speed
-
-        if len(qeue) == 0:
-            buttonspress[len(buttonspress)-1][0] = 1
+        pass
 
     if diroftvl == 0:
-        seconds = (pygame.time.get_ticks() - start_ticks) / 1000  # calculate how many seconds
-        if seconds > 12:
+        pass
 
-            if y == hieghts[0]-50:
-                qeue = fl1rem(qeue)
-                diroftvl = 1
-
-            highercount = 0
-            lowercount = 0
-
-            for each in qeue:
-
-                if hieghts[each[0] - 1] - 50 == y:
-                    print(hieghts[each[0]-1]-50,y)
-
-                    buttonspress[10-each[0]][0] = 0
-                    buttonspress[10-each[0]][1] = 0
-                if hieghts[each[0] - 1] - 50 > y:
-                    lowercount += 1
-                if hieghts[each[0] - 1] - 50 < y:
-                    highercount += 1
-
-            if highercount > 0 and hieghts[0]-50 == y:
-                diroftvl = 1
-
-            if highercount > 0 and lowercount == 0:
-                diroftvl = 1
-
-            if prev == 1 and highercount > 0:
-                print("PReVcheck")
-                diroftvl = 1
-
-            if lowercount > 0 and highercount == 0:
-                diroftvl = 2
-
-            if prev == 2:
-                if hieghts[0]-50 != y:
-                    diroftvl = 2
-
-            if highercount == 0:
-                if y != hieghts[0] -50:
-                    diroftvl = 2
-                else:
-                    diroftvl = 3
-            if y == hieghts[0]-50:
-                buttonspress[len(buttonspress)-1][0] = 0
-            seconds = 0
 
 
 
@@ -272,13 +181,14 @@ while True:
 
                 if selected != 10:
                     buttonspress[10-selected][0] = 1
-
+                    qeue.append([selected,1])
 
 
             if event.key == pygame.K_DOWN:
 
                 if selected != 1:
                     buttonspress[10 - selected][1] = 1
+                    qeue.append([selected,0])
 
 
             if event.key == pygame.K_1:
@@ -319,7 +229,7 @@ while True:
             print(xcord,ycord)
 
 
-    qeue = butque(buttonspress)
+    qeue = checker(qeue)
     generalbkg()
     flnums(buttonspress,selected)
     elevator(y, diroftvl,seconds)
@@ -330,7 +240,5 @@ while True:
     drawinsidebuttons(insidebuts)
     pygame.display.update()
     print(diroftvl)
-    print(qeue)
-    print(y)
-    print(buttonspress)
 pygame.quit()
+
