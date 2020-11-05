@@ -3,8 +3,8 @@ from pygame.locals import *
 import sys
 import time
 import random
-
-
+import json
+import datetime
 pygame.init()
 width, length = 680,720
 screen = pygame.display.set_mode((width,length))
@@ -25,6 +25,11 @@ for x in range(10):
     buttonspress.append([0,0])
 hieghts = []
 
+floornums = []
+for x in range(10):
+    floornums.append(x)
+
+
 for x in range(70,701,70):
     hieghts.append(x)
 
@@ -37,7 +42,7 @@ for x in range(70,771,70):
 
 hieghts2.reverse()
 
-
+log = []
 
 
 y= 720-hieghts[9]
@@ -46,7 +51,7 @@ speed = 5
 #speed = 5
 speedtick = 10
 speedtick = 60
-
+pygame.init()
 def generalbkg():
     empty_rect = pygame.Rect(20, 10, 100,700)
     pygame.draw.rect(screen, (0, 0, 0), empty_rect, 3)
@@ -55,6 +60,8 @@ def generalbkg():
     empty_rect = pygame.Rect(290, 10, 150,700)
     pygame.draw.rect(screen, (0, 0, 0), empty_rect, 3)
     empty_rect = pygame.Rect(460, 10, 200, 700)
+    pygame.draw.rect(screen, (0, 0, 0), empty_rect, 3)
+    empty_rect = pygame.Rect(600, 400, 40, 240)
     pygame.draw.rect(screen, (0, 0, 0), empty_rect, 3)
 diroftvl = 3
 
@@ -91,11 +98,17 @@ def elevator(y,dir,secs):
 
     if secs < 4:
         pygame.draw.rect(screen, (200, 200, 200), (300, y, 130 - ((secs / 4) * 130), 35))
+        if 1.1 <secs < 1.3:
+            timdate = datetime.datetime.now()
+            log.append(f"Door opening at: {timdate}")
     if 4 < secs < 8:
         pygame.draw.rect(screen, (200, 200, 200), (300, y, 1, 35))
 
     if 8 < secs < 13:
         pygame.draw.rect(screen, (200, 200, 200), (300, y, ((secs - 8) / 4) * 130, 35))
+        if 8.1 < secs < 8.3:
+            timdate = datetime.datetime.now()
+            log.append(f"Door closing at: {timdate}")
 
     font = pygame.font.Font('freesansbold.ttf', 15)
     text = font.render(f"{'OPEN' if dir == 0 else 'closed'}", False, (255, 0, 0))
@@ -167,6 +180,19 @@ def butque(buttons,inbut):
             qu.append([counter+1,3])
     return qu
 
+def drawcurentfloor(floor,direction):
+    font = pygame.font.Font('freesansbold.ttf', 35)
+    text = font.render(f"{floor}", False, (255, 0, 0))
+    screen.blit(text, (610, 500))
+
+    if direction == 1:
+        pygame.draw.polygon(screen, (0, 255, 0),((610, 500), (630, 500), (630,450), (640, 450), (620,410 ), (600, 450), (610, 450)))
+    if direction == 2:
+        pygame.draw.polygon(screen, (255, 0, 0),((610, 550), (630, 550), (630, 600), (640, 600), (620, 640), (600,600), (610, 600)))
+
+
+start_ticks2 = pygame.time.get_ticks()
+
 while True:
     screen.fill((150, 150, 150))
     #y = 720 - hieghts[selected-1]
@@ -175,6 +201,12 @@ while True:
 
 
     if diroftvl == 3:
+        seconds2 = (pygame.time.get_ticks() - start_ticks2) / 1000
+        print(seconds2)
+        if seconds2 >60:
+            if y != hieghts[0]-50:
+                buttonspress[len(buttonspress)-1][0] = 1
+
         counthigher = 0
         countlower = 0
         for each in qeue:
@@ -197,13 +229,14 @@ while True:
 
     if diroftvl == 0:
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000
-        insidebuts[getfloor(hieghts2,y)-1] = 0
+        #print("FLOOR:",getfloor(hieghts2,y)-1)
+
+        insidebuts[getfloor(hieghts2,y)-2] = 0
         if seconds > 12:
 
             if y == hieghts[0] - 50:
                 diroftvl = 3
-
-
+                start_ticks2 = pygame.time.get_ticks()
 
             if prev == 2:
 
@@ -214,6 +247,7 @@ while True:
                             countlower += 1
 
                 if countlower > 0:
+
                     diroftvl = 2
 
             if prev == 1:
@@ -230,7 +264,9 @@ while True:
                     diroftvl = 2
 
             if len(qeue) == 0:
+
                 diroftvl = 3
+                start_ticks2 = pygame.time.get_ticks()
 
             seconds = 0
 
@@ -245,15 +281,22 @@ while True:
                     counthigher += 1
         for each in qeue:
             if len(each) != 1:
-                if (hieghts[each[0]-1] - 50 == y and each[1] == 1):
-                    buttonspress[10-(each[0])][0] = 0
+                if (hieghts[each[0]-1] - 50 == y):
+                    if each[1] == 1:
+                        buttonspress[10-(each[0])][0] = 0
+                        start_ticks = pygame.time.get_ticks()
+                        diroftvl = 0
+                        #print("RANDOM FLOOR UP!")
+                        current = getfloor(hieghts2, y)-1
+                        ran = random.randint(current, 9)
+                        insidebuts[ran] = 1
 
-                    start_ticks = pygame.time.get_ticks()
-                    diroftvl = 0
                 if hieghts[each[0]-1] - 50 == y and each[1] == 3:
                     insidebuts[each[0]-1] = 0
                     start_ticks = pygame.time.get_ticks()
                     diroftvl = 0
+
+
         highest = [0,0]
         for each in qeue:
             if len(each) != 1:
@@ -282,8 +325,17 @@ while True:
 
         if (hieghts[highest[0]-1] - 50 == y):
             if highest[1] == 0 or highest[1] == 1:
+                #print(highest)
+                buttonspress[10-(highest[0])][1] = 0
+                ran1 = random.randint(0, 9)
+                if highest[1] == 0:
+                    if ran1 != 0:
+                        insidebuts[0] = 1
+                    if ran1 == 0:
+                        current = getfloor(hieghts2, y)-1
+                        ran = random.randint(0, current)
 
-                buttonspress[10-(highest[1])][1] = 0
+                        insidebuts[ran] = 1
                 diroftvl = 0
 
                 start_ticks = pygame.time.get_ticks()
@@ -307,24 +359,45 @@ while True:
                     countlower += 1
 
                 if hieghts[each[0]-1]-50 == y and (each[1] == 0 or each[1]==3):
+
                     buttonspress[10 - (each[0])][1] = 0
                     start_ticks = pygame.time.get_ticks()
                     diroftvl = 0
+                    if each[1] == 0:
+
+                        ran1 = random.randint(0,9)
+                        if ran1 != 0:
+                            insidebuts[0] = 1
+                        if ran1 == 0:
+                            current = getfloor(hieghts2,y)-1
+                            ran = random.randint(0,current)
+
+                            insidebuts[ran] = 1
+
 
                 if hieghts[0] -50 == y and buttonspress[len(buttonspress) - 1][0] == 1:
                     buttonspress[len(buttonspress) - 1][0] = 0
                     diroftvl = 0
                     start_ticks = pygame.time.get_ticks()
-        for count,each in enumerate(insidebuts):
-            print('count:',count)
+        #for count,each in enumerate(insidebuts):
+            #print('count:',count)
         if countlower > 0:
             y += speed
 
 
     for event in pygame.event.get():
         if event.type == QUIT:
+            print("MAKING LOG!")
+            total = {}
+            total['log'] = log
+            with open(f"Log.json", "w") as out:
+                json.dump(total, out)
             pygame.quit()
-            sys.exit()
+            exit()
+
+        keys = pygame.key.get_pressed()
+        if keys[K_h]:
+            timdate = datetime.datetime.now()
         if event.type == pygame.KEYDOWN:
             if event.key == ord('w'):
                 if selected < 10:
@@ -332,67 +405,85 @@ while True:
             if event.key == ord('s'):
                 if selected > 1:
                     selected -= 1
-            if event.key == ord('h'):
-                start_ticks = pygame.time.get_ticks()
             if event.key == pygame.K_UP:
 
                 if selected != 10:
                     buttonspress[10-selected][0] = 1
+
+                    timdate = datetime.datetime.now()
+                    log.append(f"Up button, floor {10-selected} pressed: {timdate}")
 
 
             if event.key == pygame.K_DOWN:
 
                 if selected != 1:
                     buttonspress[10 - selected][1] = 1
-
+                    timdate = datetime.datetime.now()
+                    log.append(f"Down button, floor {10 - selected} pressed: {timdate}")
 
             if event.key == pygame.K_1:
 
                 insidebuts[0] = 1
-
+                timdate = datetime.datetime.now()
+                log.append(f"Button floor 1 pressed: {timdate}")
 
             if event.key == pygame.K_2:
                 insidebuts[1] = 1
+                timdate = datetime.datetime.now()
+                log.append(f"Button floor 2 pressed: {timdate}")
             if event.key == pygame.K_3:
                 insidebuts[2] = 1
-
+                timdate = datetime.datetime.now()
+                log.append(f"Button floor 3 pressed: {timdate}")
             if event.key == pygame.K_4:
                 insidebuts[3] = 1
-
+                timdate = datetime.datetime.now()
+                log.append(f"Button floor 4 pressed: {timdate}")
             if event.key == pygame.K_5:
                 insidebuts[4] = 1
-
+                timdate = datetime.datetime.now()
+                log.append(f"Button floor 5 pressed: {timdate}")
             if event.key == pygame.K_6:
                 insidebuts[5] = 1
-
+                timdate = datetime.datetime.now()
+                log.append(f"Button floor 6 pressed: {timdate}")
             if event.key == pygame.K_7:
                 insidebuts[6] = 1
-
+                timdate = datetime.datetime.now()
+                log.append(f"Button floor 7 pressed: {timdate}")
             if event.key == pygame.K_8:
-                insidebuts[7] = 1
-
+                insidebuts[6] = 1
+                timdate = datetime.datetime.now()
+                log.append(f"Button floor 8 pressed: {timdate}")
             if event.key == pygame.K_9:
                 insidebuts[8] = 1
-
+                timdate = datetime.datetime.now()
+                log.append(f"Button floor 9 pressed: {timdate}")
             if event.key == pygame.K_0:
                 insidebuts[9] = 1
-
-
+                timdate = datetime.datetime.now()
+                log.append(f"Button floor 10 pressed: {timdate}")
         if event.type == pygame.MOUSEBUTTONUP:
             print(xcord,ycord)
-
-
     qeue = butque(buttonspress,insidebuts)
     generalbkg()
     flnums(buttonspress,selected)
     elevator(y, diroftvl,seconds)
-
     butdir(buttonspress)
-
     fpsClock.tick(speedtick)
     drawinsidebuttons(insidebuts)
+    drawcurentfloor(getfloor(hieghts2,y)-1,diroftvl)
     pygame.display.update()
-    print(diroftvl)
-    print(qeue)
+
+
+    #print(diroftvl)
+    #print(qeue)
     #print(buttonspress)
+
+
+
 pygame.quit()
+print("MAKING LOG!")
+total['log'] = log
+with open(f"Log.json", "w") as out:
+    json.dump(total, out)
